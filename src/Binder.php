@@ -8,8 +8,8 @@ class Binder
 {
     protected $container;
     protected $bindings;
-    protected $requesters;
-    protected $dependencies;
+    protected $aliases;
+    protected $needs;
 
     public function __construct(Container $container)
     {
@@ -17,36 +17,41 @@ class Binder
         $this->bindings = [];
     }
 
-    public function setRequesters(array $requesters)
+    public function setAlias($alias, $fqn)
     {
-        //
+        $this->aliases[$alias] = $fqn;
     }
 
-    public function setBindings(array $bindings)
+    public function setBinding($alias, $interface, $concrete)
     {
-        //
+        $this->bindings[$alias] = [
+            'interface' => $interface,
+            'concrete'  => $concrete,
+        ];
     }
 
-    public function setDependencies(array $dependencies)
+    public function setNeeds($alias, array $needs)
     {
-        //
+        $this->needs[$alias] = $needs;
     }
 
     public function register()
     {
-        foreach ($this->dependencies as $base => $dependencies) {
-            $base_fqn = $this->requesters[$base];
+        foreach ($needs as $parent => $dependencies) {
+            $this->registerDependencies($this->aliases[$parent], $dependencies);
+        }
+    }
 
-            foreach ($dependencies as $dependency) {
-                $dependency_fqn = $this->bindings[$dependency]['fqn'];
-                $binding = $this->bindings[$dependency]['binding'];
+    protected function registerDependencies($parent_fqn, $dependencies)
+    {
+        foreach ($dependencies as $dependency) {
+            $dependency_fqns = $this->bindings[$dependency];
 
-                $this
-                    ->container
-                    ->when($base_fqn)
-                    ->needs($dependency_fqn)
-                    ->give($binding);
-            }
+            $this
+                ->container
+                ->when($parent_fqn)
+                ->needs($dependency_fqns['interface'])
+                ->give($dependency_fqns['concrete']);
         }
     }
 }
