@@ -37,7 +37,7 @@ class Binder
 
     public function register()
     {
-        foreach ($needs as $parent => $dependencies) {
+        foreach ($this->needs as $parent => $dependencies) {
             $this->registerDependencies($this->aliases[$parent], $dependencies);
         }
     }
