@@ -1,0 +1,25 @@
+{
+    "name": "enzyme/laravel-binder",
+    "type": "helper",
+    "description": "A service container contextual binding helper for Laravel 5.",
+    "keywords": ["enzyme","laravel","contextual","binding","service","container","php"],
+    "homepage": "https://github.com/enzyme/laravel-binder",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tristan Strathearn",
+            "email": "r3oath@protonmail.ccom",
+            "homepage": "https://github.com/r3oath",
+            "role": "Full Stack Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "illuminate/contracts": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Enzyme\\LaravelBinder\\": "src/"
+        }
+    }
+}
