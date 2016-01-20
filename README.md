@@ -62,4 +62,6 @@ public function __construct(RepositoryInterface $repo, FactoryInterface $factory
 
 # What's the purpose?
 
-With your application service provider(s) now being the arbiter of what classes get what implementations, if you ever want to switch those implementation out with another, it's easy. No longer do you have to go into your controller or service class etc and update the references to the concrete implementations, you only have the interfaces listed. Laravel has provided this functionality, all **Binder** is doing is making the management of these bindings just a touch easier, especially if you have a lot of them.
+With your service provider(s) now being the sole authority of which classes get what implementations, if you ever want to switch those implementation out with another, it's easy!
+
+No longer do you have to go into your controllers or service classes and update the references to the concrete implementations. **Laravel** has provided this functionality for you, all **Binder** is doing is making the management of these bindings a touch easier, especially when you have to manage a lot of them.
