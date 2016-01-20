@@ -4,23 +4,62 @@ namespace Enzyme\LaravelBinder;
 
 use Illuminate\Contracts\Container\Container;
 
+/**
+ * Manages a set of context bindings using Laravel's service container.
+ */
 class Binder
 {
+    /**
+     * A reference to the service container.
+     * @var \Illuminate\Contracts\Container\Container
+     */
     protected $container;
+
+    /**
+     * A collection of bindings.
+     * @var array
+     */
     protected $bindings = [];
+
+    /**
+     * A collection of aliases.
+     * @var array
+     */
     protected $aliases = [];
+
+    /**
+     * A collection of classes and their dependencies.
+     * @var array
+     */
     protected $needs = [];
 
+    /**
+     * Create a new Binder from the given service container instance.
+     * @param \Illuminate\Contracts\Container\Container $container
+     */
     public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * Create an alias for the given class or interface.
+     *
+     * @param string $alias The alias.
+     * @param string $fqn   The full namespaced path to the class or interface.
+     */
     public function setAlias($alias, $fqn)
     {
         $this->aliases[$this->cleanAlias($alias)] = $fqn;
     }
 
+    /**
+     * Create a binding from an interface to a concrete class.
+     *
+     * @param string $alias     The alias for this binding.
+     * @param string $interface The interface.
+     * @param string $concrete  The concrete implementation.
+     */
     public function setBinding($alias, $interface, $concrete)
     {
         $this->bindings[$this->cleanAlias($alias)] = [
@@ -29,11 +68,22 @@ class Binder
         ];
     }
 
+    /**
+     * Set the dependencies of a class.
+     *
+     * @param string $alias The alias of the class.
+     * @param array  $needs An array of dependencies.
+     */
     public function setNeeds($alias, array $needs)
     {
         $this->needs[$this->cleanAlias($alias)] = $needs;
     }
 
+    /**
+     * Register all the dependencies with the underlying service container.
+     *
+     * @return void
+     */
     public function register()
     {
         foreach ($this->needs as $parent => $dependencies) {
@@ -41,7 +91,15 @@ class Binder
         }
     }
 
-    protected function registerDependencies($parent_fqn, $dependencies)
+    /**
+     * Registers the given dependencies with the parent class.
+     *
+     * @param string $parent_fqn   The full namespaced class path.
+     * @param array  $dependencies The collection of dependencies.
+     *
+     * @return void
+     */
+    protected function registerDependencies($parent_fqn, array $dependencies)
     {
         foreach ($dependencies as $dependency) {
             $dependency_tree = $this->bindings[$dependency];
@@ -54,6 +112,15 @@ class Binder
         }
     }
 
+    /**
+     * Get the fully qualified name for the given string if it's an alias
+     * otherwise ensure the class/interface exists and return it. Will throw a
+     * BindingException if the class/interface does not exist.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
     protected function getFqn($string)
     {
         if (class_exists($string) || interface_exists($string)) {
@@ -69,12 +136,29 @@ class Binder
         );
     }
 
-    protected function arrayHas($array, $key)
+    /**
+     * Check if the given array has the key specified.
+     *
+     * @param array $array The array to check.
+     * @param mixed $key   The key.
+     *
+     * @return boolean
+     */
+    protected function arrayHas(array $array, $key)
     {
         return isset($array[$key])
             && array_key_exists($key, $array);
     }
 
+    /**
+     * Return a clean alias and ensure it is a string and not of length zero.
+     * Will throw a BindingException if the value given is not a string or a
+     * string of length zero.
+     *
+     * @param string $alias
+     *
+     * @return string
+     */
     protected function cleanAlias($alias)
     {
         if (is_string($alias) && strlen($alias) > 0)
