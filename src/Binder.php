@@ -7,24 +7,23 @@ use Illuminate\Contracts\Container\Container;
 class Binder
 {
     protected $container;
-    protected $bindings;
-    protected $aliases;
-    protected $needs;
+    protected $bindings = [];
+    protected $aliases = [];
+    protected $needs = [];
 
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->bindings = [];
     }
 
     public function setAlias($alias, $fqn)
     {
-        $this->aliases[$alias] = $fqn;
+        $this->aliases[$this->cleanAlias($alias)] = $fqn;
     }
 
     public function setBinding($alias, $interface, $concrete)
     {
-        $this->bindings[$alias] = [
+        $this->bindings[$this->cleanAlias($alias)] = [
             'interface' => $interface,
             'concrete'  => $concrete,
         ];
@@ -32,7 +31,7 @@ class Binder
 
     public function setNeeds($alias, array $needs)
     {
-        $this->needs[$alias] = $needs;
+        $this->needs[$this->cleanAlias($alias)] = $needs;
     }
 
     public function register()
@@ -74,5 +73,15 @@ class Binder
     {
         return isset($array[$key])
             && array_key_exists($key, $array);
+    }
+
+    protected function cleanAlias($alias)
+    {
+        if (is_string($alias) && strlen($alias) > 0)
+        {
+            return $alias;
+        }
+
+        throw new BindingException("The alias [{$alias}] is invalid.");
     }
 }
