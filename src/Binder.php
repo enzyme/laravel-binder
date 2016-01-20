@@ -57,7 +57,7 @@ class Binder
 
     protected function getFqn($string)
     {
-        if (class_exists($string)) {
+        if (class_exists($string) || interface_exists($string)) {
             return $string;
         }
 
