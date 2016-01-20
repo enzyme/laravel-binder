@@ -26,31 +26,71 @@ class BinderTest extends PHPUnit_Framework_TestCase
         $binder->register();
     }
 
-    protected function buildContainer()
+    /**
+     * @expectedException Enzyme\LaravelBinder\BindingException
+     */
+    public function test_binder_throws_exception_on_undefined_alias_class()
+    {
+        $binder = new Binder($this->buildDumbContainer());
+
+        $binder->setAlias('controller', 'Acme\Tests\NotExist');
+        $binder->setAlias('interface', $this->test_interface);
+        $binder->setBinding('bar', 'interface', $this->test_concrete);
+        $binder->setNeeds('controller', ['bar']);
+
+        $binder->register();
+    }
+
+    /**
+     * @expectedException Enzyme\LaravelBinder\BindingException
+     */
+    public function test_binder_throws_exception_on_bad_alias_name()
+    {
+        $binder = new Binder($this->buildDumbContainer());
+
+        $binder->setAlias(123, 'Acme\Tests\NotExist');
+    }
+
+    /**
+     * @expectedException Enzyme\LaravelBinder\BindingException
+     */
+    public function test_binder_throws_exception_on_empty_alias_name()
+    {
+        $binder = new Binder($this->buildDumbContainer());
+
+        $binder->setAlias('', 'Acme\Tests\NotExist');
+    }
+
+    protected function buildContainer($times = 1)
     {
         return m::mock('Illuminate\Contracts\Container\Container',
-            function ($mock) {
+            function ($mock) use ($times) {
                 $mock
                     ->shouldReceive('when')
                     ->with($this->test_controller)
                     ->atLeast()
-                    ->times(1)
+                    ->times($times)
                     ->andReturn($mock);
 
                 $mock
                     ->shouldReceive('needs')
                     ->with($this->test_interface)
                     ->atLeast()
-                    ->times(1)
+                    ->times($times)
                     ->andReturn($mock);
 
                 $mock
                     ->shouldReceive('give')
                     ->with($this->test_concrete)
                     ->atLeast()
-                    ->times(1)
+                    ->times($times)
                     ->andReturn($mock);
             }
         );
+    }
+
+    protected function buildDumbContainer()
+    {
+        return $this->buildContainer(0);
     }
 }
