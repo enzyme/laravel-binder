@@ -38,20 +38,41 @@ class Binder
     public function register()
     {
         foreach ($this->needs as $parent => $dependencies) {
-            $this->registerDependencies($this->aliases[$parent], $dependencies);
+            $this->registerDependencies($this->getFqn($parent), $dependencies);
         }
     }
 
     protected function registerDependencies($parent_fqn, $dependencies)
     {
         foreach ($dependencies as $dependency) {
-            $dependency_fqns = $this->bindings[$dependency];
+            $dependency_tree = $this->bindings[$dependency];
 
             $this
                 ->container
                 ->when($parent_fqn)
-                ->needs($dependency_fqns['interface'])
-                ->give($dependency_fqns['concrete']);
+                ->needs($this->getFqn($dependency_tree['interface']))
+                ->give($this->getFqn($dependency_tree['concrete']));
         }
+    }
+
+    protected function getFqn($string)
+    {
+        if (class_exists($string)) {
+            return $string;
+        }
+
+        if ($this->arrayHas($this->aliases, $string)) {
+            return $this->getFqn($this->aliases[$string]);
+        }
+
+        throw new BindingException(
+            "The class or alias [{$string}] does not exist."
+        );
+    }
+
+    protected function arrayHas($array, $key)
+    {
+        return isset($array[$key])
+            && array_key_exists($key, $array);
     }
 }
