@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/enzyme/laravel-binder.svg?branch=master)](https://travis-ci.org/enzyme/laravel-binder)
 [![Coverage Status](https://coveralls.io/repos/github/enzyme/laravel-binder/badge.svg?branch=master)](https://coveralls.io/github/enzyme/laravel-binder?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/enzyme/laravel-binder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/enzyme/laravel-binder/?branch=master)
 
 A service container contextual binding helper for Laravel 5.
 
