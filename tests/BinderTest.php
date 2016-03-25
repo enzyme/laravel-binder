@@ -133,8 +133,7 @@ class BinderTest extends PHPUnit_Framework_TestCase
             function($mock) {
                 $mock
                     ->shouldReceive('bind')
-                    ->atLeast()
-                    ->times(2);
+                    ->once();
             }
         );
     }
