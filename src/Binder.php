@@ -79,7 +79,7 @@ class Binder
             'concrete'  => $concrete,
         ];
 
-        $this->lastBinding = compact('alias', 'interface', 'concrete');
+        $this->lastBinding = compact('alias', 'concrete');
 
         return $this;
     }
@@ -91,24 +91,20 @@ class Binder
      */
     public function solidify()
     {
-        if (count($this->lastBinding) < 3) {
+        if (count($this->lastBinding) < 2) {
             throw new BindingException(
-                "Container injection can't be completed ".
-                "as a previous binding hasn't occured."
+                "Container injection can't be completed as a previous ".
+                "binding operation hasn't yet to occur."
             );
         }
 
         $alias = $this->lastBinding['alias'];
-        $interface = $this->lastBinding['interface'];
         $concrete = $this->lastBinding['concrete'];
 
         $this
             ->container
-            ->bind($this->getFqn($interface), $concrete);
-        $this
-            ->container
-            ->bind($alias, function($app) use($interface) {
-                return $app->make($this->getFqn($interface));
+            ->bind($alias, function($app) use($concrete) {
+                return $app->make($concrete);
             });
     }
 
