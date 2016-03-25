@@ -73,19 +73,17 @@ class Binder
             'concrete'  => $concrete,
         ];
 
-        $this->lastBinding['alias'] = $alias;
-        $this->lastBinding['interface'] = $interface;
-        $this->lastBinding['concrete'] = $concrete;
+        $this->lastBinding = compact('alias', 'interface', 'concrete');
 
         return $this;
     }
 
     /**
-     * Inject the previous binding into the Laravel service container. This
-     * will map the interface to the concrete class, then create an alias for
-     * the interface so it can later be referenced by its short name.
+     * Binds the previous virtual binding into the Laravel service container.
+     * This will map the interface to the concrete class, then create an alias
+     * for the interface so it can later be referenced by its short name.
      */
-    public function inject()
+    public function solidify()
     {
         if (count($this->lastBinding) < 3) {
             throw new BindingException(
@@ -98,10 +96,14 @@ class Binder
         $interface = $this->lastBinding['interface'];
         $concrete = $this->lastBinding['concrete'];
 
-        $this->container->bind($interface, $concrete);
-        $this->container->bind($alias, function($app) use($interface) {
-            return $app->make($interface);
-        });
+        $this
+            ->container
+            ->bind($interface, $concrete);
+        $this
+            ->container
+            ->bind($alias, function($app) use($interface) {
+                return $app->make($interface);
+            });
     }
 
     /**
@@ -154,10 +156,12 @@ class Binder
      * BindingException if the class/interface does not exist.
      *
      * @param string $string
+     * @param bool   $concrete When getting the FQN of a binding, return the
+     *                         concrete implementation instead of the interface.
      *
      * @return string
      */
-    protected function getFqn($string)
+    protected function getFqn($string, $concrete = false)
     {
         if (class_exists($string) || interface_exists($string)) {
             return $string;
@@ -165,6 +169,14 @@ class Binder
 
         if ($this->arrayHas($this->aliases, $string)) {
             return $this->getFqn($this->aliases[$string]);
+        }
+
+        if ($this->arrayHas($this->bindings, $string)) {
+            $string = $concrete === true
+                ? $this->bindings[$string]['concrete']
+                : $this->bindings[$string]['interface'];
+
+            return $this->getFqn($string);
         }
 
         throw new BindingException(
