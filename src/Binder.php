@@ -104,11 +104,11 @@ class Binder
 
         $this
             ->container
-            ->bind($interface, $concrete);
+            ->bind($this->getFqn($interface), $concrete);
         $this
             ->container
             ->bind($alias, function($app) use($interface) {
-                return $app->make($interface);
+                return $app->make($this->getFqn($interface));
             });
     }
 
