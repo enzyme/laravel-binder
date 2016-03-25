@@ -11,36 +11,42 @@ class Binder
 {
     /**
      * A reference to the service container.
+     *
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
     /**
      * A collection of bindings.
+     *
      * @var array
      */
     protected $bindings = [];
 
     /**
      * A collection of aliases.
+     *
      * @var array
      */
     protected $aliases = [];
 
     /**
      * A collection of classes and their dependencies.
+     *
      * @var array
      */
     protected $needs = [];
 
     /**
      * Holds a record of the last binding that occured.
+     *
      * @var array
      */
     protected $lastBinding = [];
 
     /**
      * Create a new Binder from the given service container instance.
+     * 
      * @param \Illuminate\Contracts\Container\Container $container
      */
     public function __construct(Container $container)
@@ -119,8 +125,6 @@ class Binder
 
     /**
      * Register all the dependencies with the underlying service container.
-     *
-     * @return void
      */
     public function register()
     {
@@ -134,8 +138,6 @@ class Binder
      *
      * @param string $parent_fqn   The full namespaced class path.
      * @param array  $dependencies The collection of dependencies.
-     *
-     * @return void
      */
     protected function registerDependencies($parent_fqn, array $dependencies)
     {
@@ -156,8 +158,6 @@ class Binder
      * BindingException if the class/interface does not exist.
      *
      * @param string $string
-     * @param bool   $concrete When getting the FQN of a binding, return the
-     *                         concrete implementation instead of the interface.
      *
      * @return string
      */
