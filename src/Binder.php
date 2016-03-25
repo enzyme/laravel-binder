@@ -34,6 +34,12 @@ class Binder
     protected $needs = [];
 
     /**
+     * Holds a record of the last binding that occured.
+     * @var array
+     */
+    protected $lastBinding = [];
+
+    /**
      * Create a new Binder from the given service container instance.
      * @param \Illuminate\Contracts\Container\Container $container
      */
@@ -66,6 +72,36 @@ class Binder
             'interface' => $interface,
             'concrete'  => $concrete,
         ];
+
+        $this->lastBinding['alias'] = $alias;
+        $this->lastBinding['interface'] = $interface;
+        $this->lastBinding['concrete'] = $concrete;
+
+        return $this;
+    }
+
+    /**
+     * Inject the previous binding into the Laravel service container. This
+     * will map the interface to the concrete class, then create an alias for
+     * the interface so it can later be referenced by its short name.
+     */
+    public function inject()
+    {
+        if (count($this->lastBinding) < 3) {
+            throw new BindingException(
+                "Container injection can't be completed ".
+                "as a previous binding hasn't occured."
+            );
+        }
+
+        $alias = $this->lastBinding['alias'];
+        $interface = $this->lastBinding['interface'];
+        $concrete = $this->lastBinding['concrete'];
+
+        $this->container->bind($interface, $concrete);
+        $this->container->bind($alias, function($app) use($interface) {
+            return $app->make($interface);
+        });
     }
 
     /**
