@@ -161,7 +161,7 @@ class Binder
      *
      * @return string
      */
-    protected function getFqn($string, $concrete = false)
+    protected function getFqn($string)
     {
         if (class_exists($string) || interface_exists($string)) {
             return $string;
@@ -169,14 +169,6 @@ class Binder
 
         if ($this->arrayHas($this->aliases, $string)) {
             return $this->getFqn($this->aliases[$string]);
-        }
-
-        if ($this->arrayHas($this->bindings, $string)) {
-            $string = $concrete === true
-                ? $this->bindings[$string]['concrete']
-                : $this->bindings[$string]['interface'];
-
-            return $this->getFqn($string);
         }
 
         throw new BindingException(
