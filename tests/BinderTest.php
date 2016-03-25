@@ -27,13 +27,27 @@ class BinderTest extends PHPUnit_Framework_TestCase
         $binder->register();
     }
 
-    public function test_binder_stores_last_binding_correctly_and_solidifies_it_as_expected()
+    public function test_binder_stores_last_binding_correctly_and_solidifies_it_as_expected_using_interface_fqn()
     {
         $binder = new Binder($this->buildSolidifyingContainer());
 
         $binder->setBinding(
             $this->test_alias,
             $this->test_interface,
+            $this->test_concrete
+        );
+
+        $binder->solidify();
+    }
+
+    public function test_binder_stores_last_binding_correctly_and_solidifies_it_as_expected_using_interface_alias()
+    {
+        $binder = new Binder($this->buildSolidifyingContainer());
+
+        $binder->setAlias('interface', $this->test_interface);
+        $binder->setBinding(
+            $this->test_alias,
+            'interface',
             $this->test_concrete
         );
 
