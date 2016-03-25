@@ -8,6 +8,7 @@ class BinderTest extends PHPUnit_Framework_TestCase
     protected $test_controller = 'Enzyme\LaravelBinder\Tests\Controller';
     protected $test_interface = 'Enzyme\LaravelBinder\Tests\FooInterface';
     protected $test_concrete = 'Enzyme\LaravelBinder\Tests\Bar';
+    protected $test_alias = 'foo';
 
     public function tearDown()
     {
@@ -24,6 +25,19 @@ class BinderTest extends PHPUnit_Framework_TestCase
         $binder->setNeeds('controller', ['bar']);
 
         $binder->register();
+    }
+
+    public function test_binder_stores_last_binding_correctly_and_solidifies_it_as_expected()
+    {
+        $binder = new Binder($this->buildSolidifyingContainer());
+
+        $binder->setBinding(
+            $this->test_alias,
+            $this->test_interface,
+            $this->test_concrete
+        );
+
+        $binder->solidify();
     }
 
     /**
@@ -61,6 +75,16 @@ class BinderTest extends PHPUnit_Framework_TestCase
         $binder->setAlias('', 'Acme\Tests\NotExist');
     }
 
+    /**
+     * @expectedException Enzyme\LaravelBinder\BindingException
+     */
+    public function test_binder_throws_exception_on_solidifying_non_existent_binding()
+    {
+        $binder = new Binder($this->buildDumbContainer());
+
+        $binder->solidify();
+    }
+
     protected function buildContainer($times = 1)
     {
         return m::mock('Illuminate\Contracts\Container\Container',
@@ -85,6 +109,18 @@ class BinderTest extends PHPUnit_Framework_TestCase
                     ->atLeast()
                     ->times($times)
                     ->andReturn($mock);
+            }
+        );
+    }
+
+    protected function buildSolidifyingContainer()
+    {
+        return m::mock('Illuminate\Contracts\Container\Container',
+            function($mock) {
+                $mock
+                    ->shouldReceive('bind')
+                    ->atLeast()
+                    ->times(2);
             }
         );
     }
