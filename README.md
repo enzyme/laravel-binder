@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/enzyme/laravel-binder/badge.svg?branch=master)](https://coveralls.io/github/enzyme/laravel-binder?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/enzyme/laravel-binder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/enzyme/laravel-binder/?branch=master)
 
-A service container contextual binding helper for Laravel 5.
+A contextual binding helper for Laravel 5.
 
 # Example
 
@@ -67,6 +67,4 @@ public function __construct(RepositoryInterface $repo, FactoryInterface $factory
 
 # What's the purpose?
 
-With your service provider(s) now being the sole authority of which classes get what implementations, if you ever want to switch those implementation out with another, it's easy!
-
-No longer do you have to go into your controllers or service classes and update the references to the concrete implementations. **Laravel** has provided this functionality for you, all **Binder** is doing is making the management of these bindings a touch easier, especially when you have to manage a lot of them.
+With your service provider(s) now being the sole authority for which classes get what implementations, if you ever need to switch those implementations, it's dead simple and in one spot!
